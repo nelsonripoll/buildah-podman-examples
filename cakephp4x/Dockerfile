@@ -15,11 +15,12 @@ RUN EXPECTED_SIGNATURE="$(curl https://composer.github.io/installer.sig)" \
  && rm composer-setup.php
 
 # INSTALL & CONFIGURE CAKEPHP DEPENDENCIES
-RUN apt-get install -y libzip-dev libfreetype6-dev libjpeg62-turbo-dev libpng-dev libicu-dev libxml2-dev libonig-dev git \
+RUN apt-get install -y libfreetype6-dev libjpeg62-turbo-dev libpng-dev libzip-dev libicu-dev git unzip \
  && docker-php-ext-configure gd --with-freetype --with-jpeg \
- && docker-php-ext-install -j$(nproc) mbstring intl iconv simplexml pdo pdo_mysql zip gd pcntl  
+ && docker-php-ext-install -j$(nproc) intl pdo_mysql zip gd pcntl
 
-RUN composer create-project --no-interaction --prefer-dist cakephp/app:~4.0 $APPNAME \
- && cd $APPNAME \
+RUN composer create-project --no-interaction --prefer-dist cakephp/app:~4.0 $APPNAME
 
-CMD php bin/cake.php server -H 0.0.0.0 -p 8080
+WORKDIR /opt/$APPNAME
+
+CMD ["php", "bin/cake.php", "server", "-H", "0.0.0.0", "-p", "8080"]
